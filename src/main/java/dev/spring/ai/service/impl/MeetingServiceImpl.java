@@ -2,12 +2,18 @@ package dev.spring.ai.service.impl;
 
 import dev.spring.ai.service.MeetingService;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,76 +25,76 @@ public class MeetingServiceImpl implements MeetingService
 	private final ChatClient chatClient;
 
 	/**
-	 * Constructs an OutputParserImpl with a ChatClient built from the provided builder.
-	 *
-	 * @param chatClient the ChatClient.Builder used to build the ChatClient instance
-	 */
-	public MeetingServiceImpl(ChatClient.Builder chatClient) throws IOException
-	{
-		this.chatClient = chatClient.build();
-		loadTranscripts();
-	}
+	     * VectorStore is used to retrieve relevant meeting transcript documents
+	     * based on semantic similarity to the user's question. It is declared
+	     * final because the service depends on a single store instance.
+	     */
+	    private final VectorStore vectorStore;
 
-	/**
-	 * In-memory cache of meeting transcripts keyed by meeting id.
-	 *
-	 * Each entry maps a short meeting identifier (for example "meeting1") to the
-	 * full transcript text loaded from the resources directory.
-	 */
-	private final Map<String, String> transcripts = new HashMap<>();
+	    /**
+	     * Construct the MeetingService implementation.
+	     *
+	     * @param chatClient  a builder for the {@link ChatClient} used to send prompts and receive responses
+	     * @param vectorStore the {@link VectorStore} used to perform semantic similarity searches over meeting transcripts
+	     * @throws IOException if building the chat client fails (propagated from the builder)
+	     */
+	    public MeetingServiceImpl(ChatClient.Builder chatClient, VectorStore vectorStore) throws IOException
+	    {
+	        // Build the ChatClient once during construction and keep a reference for reuse.
+	        this.chatClient = chatClient.build();
+	        this.vectorStore = vectorStore;
+	    }
 
-	/**
-	 * Loads meeting transcript files from the `src/main/resources/meetings/` folder
-	 * into the {@code transcripts} map.
-	 *
-	 * The method reads the following files:
-	 * - `src/main/resources/meetings/meeting1.txt`
-	 * - `src/main/resources/meetings/meeting2.txt`
-	 * - `src/main/resources/meetings/meeting3.txt`
-	 *
-	 * @throws IOException if any of the transcript files cannot be read
-	 */
-	private void loadTranscripts() throws IOException
-	{
-		// Load each transcript file and associate it with a meeting id.
-		transcripts.put("meeting1", Files.readString(Path.of("src/main/resources/meetings/meeting1.txt")));
-		transcripts.put("meeting2", Files.readString(Path.of("src/main/resources/meetings/meeting2.txt")));
-		transcripts.put("meeting3", Files.readString(Path.of("src/main/resources/meetings/meeting3.txt")));
-	}
 
-	/**
-	 * Ask a question about a specific meeting transcript.
-	 *
-	 * This method:
-	 * - Retrieves the transcript for the provided {@code meetingId}.
-	 * - Constructs a prompt that instructs the assistant to answer ONLY using the transcript.
-	 * - Sends the prompt to the configured {@code chatClient} and returns the assistant's text output.
-	 *
-	 * @param meetingId the identifier of the meeting whose transcript should be used (e.g. "meeting1")
-	 * @param question the user question to ask about the transcript
-	 * @return the assistant's textual response as returned by the chat client
-	 */
-	@Override
-	public String askQuestion(String meetingId, String question)
-	{
-		// Compose the prompt by injecting the chosen meeting transcript and the user question.
-		String prompt = String.format("""
-	           You are an assistant that answers questions based on meeting transcripts.
-	
-	           Meeting Transcript:
-	           %s
-	
-	           Question:
-	           %s
-	
-	           Answer concisely and base your response ONLY on the transcript.
-	           """, transcripts.get(meetingId), question);
+	    /**
+	     * Answer a user's question using only content retrieved from the meeting transcript vector store.
+	     *
+	     * Behavior:
+	     * - Performs a similarity search against the {@link VectorStore} using the provided question.
+	     * - Collects the top matching documents and inserts their text into a prompt template.
+	     * - Sends the populated prompt to the {@link ChatClient} and returns the textual result.
+	     *
+	     * Important: The assistant is instructed to ONLY use information found in the provided context.
+	     * If the context does not contain an answer, the assistant should explicitly respond with:
+	     * "The meeting transcript does not contain information related to this question."
+	     *
+	     * @param question the user's natural-language question about meeting content
+	     * @return the assistant's answer as plain text
+	     */
+	    @Override
+	    public String askQuestion(String question)
+	    {
+	        // Prompt template that instructs the assistant to use only the provided context.
+	        String promptStr = """
+	                You are an intelligent assistant designed to answer questions about meeting discussions.
+	                
+	                Your goal is to provide accurate, concise, and context-aware answers using ONLY the information from the provided meeting transcript context.
+	                If the answer is not available in the context, clearly respond:
+	                "The meeting transcript does not contain information related to this question."
+	                
+	                Context:
+	                {context}
+	                
+	                Question:
+	                {question}
+	                """;
 
-		// Send the prompt to the chat client and extract the response content.
-		String response = chatClient.prompt().user(prompt).call().chatResponse().getResult().getOutput().getContent();
-		System.out.println("ChatGPT Response: " + response);
+	        // Query the vector store to fetch the most relevant meeting transcript documents.
+	        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder().query(question).topK(2).build());
 
-		// Return the raw response text to the caller.
-		return response;
-	}
+	        // Convert the retrieved documents into a list of plain text strings.
+	        List<String> contentList = documents.stream().map(Document::getText).toList();
+
+	        // Create a prompt template and populate variables for interpolation.
+	        PromptTemplate promptTemplate = new PromptTemplate(promptStr);
+	        Map<String, Object> variables = new HashMap<>();
+	        variables.put("context", String.join("\n", contentList)); // join documents into a single context block
+	        variables.put("question", question);
+
+	        // Create the final prompt that will be sent to the chat client.
+	        Prompt prompt = promptTemplate.create(variables);
+
+	        // Send the prompt to the chat client and return the resulting text output.
+	        return chatClient.prompt(prompt).call().chatClientResponse().chatResponse().getResult().getOutput().getText();
+	    }
 }
