@@ -140,6 +140,14 @@ Go-Live | Production Deployment | Team | Jun 1
 Priya: If all goes well, we can demo the MVP in early June.
 Arjun: That works for us.
 
+Arjun: One more thing — we want to kick off Phase 2 analytics enhancements in parallel. We will need dedicated resources starting April 1, 2026 through April 30, 2026 — that is a four-week engagement. Specifically, we need 2 backend engineers with Java and Spring Boot skills, and 1 frontend developer with React experience. These should be people not fully blocked by Phase 1 deliverables during that window.
+
+Priya: Understood. We will run a resource availability check across the team — factoring in their current project commitments and any approved leaves during April — and get back to you with confirmed names before the end of this week.
+
+Karan: Good call. We should also make sure we are not pulling anyone off a critical Phase 1 sprint mid-delivery.
+
+Arjun: Agreed. Continuity on Phase 1 is the priority; Phase 2 resourcing should be additive, not disruptive.
+
 ---
 
 8. Risk & Dependency Discussion
