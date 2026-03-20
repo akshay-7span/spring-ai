@@ -35,13 +35,36 @@ public class MeetingServiceImpl implements MeetingService
 	private static final String DIVIDER   = "-".repeat(72);
 
 	/**
+	 * Maximum number of agentic loop iterations allowed per request.
+	 *
+	 * Each iteration is one LLM call.  The loop exits naturally when the LLM
+	 * produces a plain-text answer (no more tool calls).  This cap is a safety
+	 * guard against runaway loops caused by unexpected LLM behaviour.
+	 */
+	private static final int MAX_ITERATIONS = 10;
+
+	/**
 	 * Using ChatModel directly (instead of ChatClient) gives us full manual control
-	 * over the tool-calling round-trip so we can log each step explicitly:
-	 *   Step 3 → first LLM call
-	 *   Step 4 → LLM's first response (contains tool call requests)
-	 *   Step 5 → we execute the tools and collect results
-	 *   Step 6 → second LLM call with tool results attached
-	 *   Step 7 → final LLM response
+	 * over the agentic loop so we can log each iteration explicitly.
+	 *
+	 * Agentic loop — how it works:
+	 *   Each iteration = one LLM call.
+	 *   - If the LLM response contains tool-call requests:
+	 *       execute the requested tools, append results to conversation history,
+	 *       and start the next iteration.
+	 *   - If the LLM response is a plain-text answer:
+	 *       return it — the loop is done.
+	 *
+	 * Why this enables multi-step reasoning:
+	 *   Iteration 1 — LLM calls getTeamProjectAllocations → learns who is free
+	 *   Iteration 2 — LLM calls getEmployeeSkillProfile for each free person
+	 *                  → learns their technical skills
+	 *   Iteration 3 — LLM calls getTeamLeaveRecords to confirm no leave conflicts
+	 *   Final        — LLM has enough data, produces a recommendation
+	 *
+	 * The LLM cannot know which employees to profile until it has seen the
+	 * allocation result.  That sequential dependency is what forces the loop —
+	 * it cannot be collapsed into a single batch of tool calls.
 	 */
 	private final ChatModel chatModel;
 	private final VectorStore vectorStore;
@@ -93,8 +116,8 @@ public class MeetingServiceImpl implements MeetingService
 
 				When answering:
 				- For meeting content questions, use the context below.
-				- For resource availability questions, call the tools and combine the results
-				  with the meeting context to give a complete, specific recommendation.
+				- For resource availability questions, use the available tools to gather
+				  the data you need, then provide a complete recommendation.
 				- If neither the context nor the tools contain enough information, respond:
 				  "The available information does not contain enough detail to answer this question."
 
@@ -117,7 +140,7 @@ public class MeetingServiceImpl implements MeetingService
 		log.info("{}", populatedPrompt);
 		log.info(SEPARATOR);
 
-		// ── STEP 3 : First LLM call ──────────────────────────────────────────────
+		// ── STEP 3 : Register tools and seed conversation history ────────────────
 		//
 		// ToolCallback[] — what it is:
 		//   MethodToolCallbackProvider scans `employeeTools` for every @Tool-annotated
@@ -125,8 +148,8 @@ public class MeetingServiceImpl implements MeetingService
 		//     (a) the tool definition  — name, description, and JSON parameter schema.
 		//         Spring AI serialises this into the `tools[]` array of the OpenAI API
 		//         request so the LLM knows which tools are available and what they accept.
-		//     (b) the Java method reference — used in STEP 5 to actually execute the tool
-		//         when the LLM requests it.
+		//     (b) the Java method reference — used inside the agentic loop to actually
+		//         execute the tool when the LLM requests it.
 		//
 		ToolCallback[] toolCallbacks = MethodToolCallbackProvider.builder()
 				.toolObjects(employeeTools)
@@ -145,107 +168,140 @@ public class MeetingServiceImpl implements MeetingService
 		//       By default, Spring AI intercepts the LLM's tool-call requests, executes
 		//       them silently, and returns only the final answer — we never see the
 		//       intermediate steps.  Setting this to false disables that auto-execution.
-		//       The raw first LLM response (containing tool-call requests) is returned
-		//       directly to us so we can log it and execute the tools ourselves in STEP 5.
+		//       Each raw LLM response is returned directly to us so we can log it,
+		//       execute the tools, and drive the agentic loop ourselves.
 		//
 		OpenAiChatOptions options = OpenAiChatOptions.builder()
 				.toolCallbacks(toolCallbacks)
 				.internalToolExecutionEnabled(false)
 				.build();
 
+		// The message list is the full conversation history sent to OpenAI on every call.
+		// OpenAI's API is stateless — the complete history must be re-sent each time.
+		// We seed it with the user's prompt and grow it inside the agentic loop:
+		//   user → assistant (tool requests) → tool results → assistant (tool requests) → ...
 		List<Message> messages = new ArrayList<>();
 		messages.add(new UserMessage(populatedPrompt));
 
 		log.info(SEPARATOR);
-		log.info("STEP 3 : Sending first call to LLM");
-		log.info("         Tools registered and available to LLM:");
+		log.info("STEP 3 : Tools registered — starting agentic loop (max {} iterations)", MAX_ITERATIONS);
+		log.info("         Tools available to LLM:");
 		Arrays.stream(toolCallbacks).forEach(tc ->
 				log.info("           - {}  |  {}", tc.getToolDefinition().name(), tc.getToolDefinition().description().trim())
 		);
 		log.info(SEPARATOR);
 
-		ChatResponse firstResponse = chatModel.call(new Prompt(messages, options));
-
-		// AssistantMessage — what it is:
-		//   The OpenAI chat API is stateless; every call must carry the full conversation
-		//   history as an ordered list of role-tagged messages (user / assistant / tool).
-		//   When the LLM decides to call a tool it returns an `assistant`-role message
-		//   whose content is tool-call requests (not plain text).
-		//   We capture that message here so we can push it back into the history in STEP 5
-		//   before adding tool results.  Without it, OpenAI would receive `tool`-role
-		//   messages with no prior `assistant` message that requested them, causing an
-		//   API error or a misinterpreted context.
-		AssistantMessage assistantMessage = firstResponse.getResult().getOutput();
-
-		// ── STEP 4 : Log first LLM response ─────────────────────────────────────
-		log.info(SEPARATOR);
-		log.info("STEP 4 : First LLM response received");
-		log.info("         Finish reason : {}", firstResponse.getResult().getMetadata().getFinishReason());
-
-		List<AssistantMessage.ToolCall> toolCalls = assistantMessage.getToolCalls();
-
-		if (toolCalls == null || toolCalls.isEmpty())
+		// ── AGENTIC LOOP ─────────────────────────────────────────────────────────
+		//
+		// Each iteration:
+		//   1. Call the LLM with the current conversation history.
+		//   2. Capture the AssistantMessage from the response and add it to history.
+		//      AssistantMessage — what it is:
+		//        The LLM's response wrapped in an `assistant`-role message.
+		//        It is either a plain-text final answer (no tool calls) or a set of
+		//        tool-call requests (no text yet).  It must always be appended to the
+		//        history so OpenAI sees the full conversation on the next call.
+		//   3. If the response has no tool calls → return the answer (loop ends).
+		//   4. If the response has tool calls:
+		//        a. Execute each requested tool.
+		//        b. Wrap results in a ToolResponseMessage and append to history.
+		//           ToolResponseMessage carries `tool`-role messages.  OpenAI requires
+		//           a preceding `assistant` message that requested them — that is why
+		//           the AssistantMessage is always added to history before this step.
+		//        c. Continue to the next iteration — LLM will reason over the results.
+		//
+		for (int iteration = 1; iteration <= MAX_ITERATIONS; iteration++)
 		{
-			log.info("         LLM answered directly from context — no tool calls were made.");
+			// ── LLM CALL ─────────────────────────────────────────────────────────
 			log.info(SEPARATOR);
-			return assistantMessage.getText();
+			log.info("AGENTIC LOOP — Iteration {} / {}  |  Sending request to LLM", iteration, MAX_ITERATIONS);
+			log.info("               Conversation history : {} message(s) in context", messages.size());
+			log.info(SEPARATOR);
+
+			ChatResponse response = chatModel.call(new Prompt(messages, options));
+			AssistantMessage assistantMessage = response.getResult().getOutput();
+
+			// Always append the assistant message before checking for tool calls.
+			// OpenAI requires the assistant turn to precede any tool-result turns.
+			messages.add(assistantMessage);
+
+			// ── LLM RESPONSE ─────────────────────────────────────────────────────
+			log.info(SEPARATOR);
+			log.info("AGENTIC LOOP — Iteration {}  |  LLM response received", iteration);
+			log.info("               Finish reason : {}", response.getResult().getMetadata().getFinishReason());
+
+			List<AssistantMessage.ToolCall> toolCalls = assistantMessage.getToolCalls();
+
+			if (toolCalls.isEmpty())
+			{
+				// finish_reason = "stop" — the LLM produced its final answer.
+				// No more tool calls requested.  The agentic loop ends here.
+				log.info("               No tool calls requested — LLM has enough data to answer.");
+				log.info(SEPARATOR);
+				log.info("AGENTIC LOOP — COMPLETE  |  Final answer produced after {} iteration(s)", iteration);
+				log.info(DIVIDER);
+				log.info("FINAL ANSWER :");
+				log.info(DIVIDER);
+				log.info("{}", assistantMessage.getText());
+				log.info(SEPARATOR);
+				return assistantMessage.getText();
+			}
+
+			// finish_reason = "tool_calls" — the LLM needs more data before answering.
+			log.info("               LLM requested {} tool call(s) — will execute and loop back", toolCalls.size());
+			toolCalls.forEach(tc -> {
+				log.info(DIVIDER);
+				log.info("                 Tool      : {}", tc.name());
+				log.info("                 Arguments : {}", tc.arguments());
+			});
+			log.info(SEPARATOR);
+
+			// ── TOOL EXECUTION ───────────────────────────────────────────────────
+			log.info(SEPARATOR);
+			log.info("AGENTIC LOOP — Iteration {}  |  Executing {} tool(s)", iteration, toolCalls.size());
+
+			List<ToolResponseMessage.ToolResponse> toolResponses = new ArrayList<>();
+
+			for (AssistantMessage.ToolCall toolCall : toolCalls)
+			{
+				log.info(DIVIDER);
+				log.info("               Tool       : {}", toolCall.name());
+				log.info("               Arguments  : {}", toolCall.arguments());
+
+				ToolCallback matchedCallback = Arrays.stream(toolCallbacks)
+						.filter(cb -> cb.getToolDefinition().name().equals(toolCall.name()))
+						.findFirst()
+						.orElseThrow(() -> new IllegalStateException("No registered callback for tool: " + toolCall.name()));
+
+				String toolResult = matchedCallback.call(toolCall.arguments());
+
+				log.info("               Result     : {}", toolResult);
+
+				toolResponses.add(new ToolResponseMessage.ToolResponse(
+						toolCall.id(), toolCall.name(), toolResult
+				));
+			}
+
+			// Append all tool results as a single ToolResponseMessage.
+			// The next iteration will send this enriched history back to the LLM,
+			// which will reason over the new data and decide whether to call more
+			// tools or produce its final answer.
+			messages.add(new ToolResponseMessage(toolResponses, Map.of()));
+
+			log.info(DIVIDER);
+			log.info("AGENTIC LOOP — Iteration {}  |  All tools executed — feeding results back to LLM", iteration);
+			log.info("               Results summary:");
+			toolResponses.forEach(tr -> log.info("                 - {} → {} chars", tr.name(), tr.responseData().length()));
+			log.info("               → Proceeding to Iteration {}", iteration + 1);
+			log.info(SEPARATOR);
 		}
 
-		log.info("         LLM did NOT answer yet — it requested {} tool call(s):", toolCalls.size());
-		toolCalls.forEach(tc -> {
-			log.info(DIVIDER);
-			log.info("           Tool name  : {}", tc.name());
-			log.info("           Arguments  : {}", tc.arguments());
-		});
-		log.info(SEPARATOR);
-
-		// ── STEP 5 : Execute tools and collect results ───────────────────────────
-		// Push the LLM's assistant message (containing tool-call requests) into the history.
-		// OpenAI requires this to appear before the tool-result messages sent in STEP 6.
-		messages.add(assistantMessage);
-
-		List<ToolResponseMessage.ToolResponse> toolResponses = new ArrayList<>();
-
-		log.info(SEPARATOR);
-		log.info("STEP 5 : Executing tool(s) requested by LLM");
-
-		for (AssistantMessage.ToolCall toolCall : toolCalls)
-		{
-			log.info(DIVIDER);
-			log.info("         Executing tool : {}", toolCall.name());
-
-			ToolCallback matchedCallback = Arrays.stream(toolCallbacks)
-					.filter(cb -> cb.getToolDefinition().name().equals(toolCall.name()))
-					.findFirst()
-					.orElseThrow(() -> new IllegalStateException("No registered callback for tool: " + toolCall.name()));
-
-			String toolResult = matchedCallback.call(toolCall.arguments());
-
-			log.info("         Tool result :");
-			log.info("{}", toolResult);
-
-			toolResponses.add(new ToolResponseMessage.ToolResponse(
-					toolCall.id(), toolCall.name(), toolResult
-			));
-		}
-		log.info(SEPARATOR);
-
-		// ── STEP 6 : Second LLM call with tool results ───────────────────────────
-		messages.add(new ToolResponseMessage(toolResponses, Map.of()));
-
-		log.info(SEPARATOR);
-		log.info("STEP 6 : Sending second call to LLM with tool results attached");
-		log.info("         Tool results being sent back:");
-		toolResponses.forEach(tr -> log.info("           - {} : {} chars of data", tr.name(), tr.responseData().length()));
-		log.info(SEPARATOR);
-
-		ChatResponse finalResponse = chatModel.call(new Prompt(messages, options));
-
-		// ── STEP 7 : Final response ───────────────────────────────────────────────
-		log.info(SEPARATOR);
-		log.info("STEP 7 : Final LLM response received (LLM combined context + tool results)");
-		log.info(SEPARATOR);
-
-		return finalResponse.getResult().getOutput().getText();
+		// ── SAFETY EXIT ───────────────────────────────────────────────────────────
+		// Reached only if MAX_ITERATIONS completed without the LLM producing a final
+		// answer.  Should not happen under normal operation.
+		log.warn(SEPARATOR);
+		log.warn("AGENTIC LOOP — STOPPED  |  Reached max iterations ({}) without a final answer.", MAX_ITERATIONS);
+		log.warn(SEPARATOR);
+		return "Unable to produce a final answer within the allowed number of reasoning steps.";
 	}
 }

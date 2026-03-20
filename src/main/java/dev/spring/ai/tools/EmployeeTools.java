@@ -1,6 +1,7 @@
 package dev.spring.ai.tools;
 
 import dev.spring.ai.service.impl.EmployeeDataService;
+import dev.spring.ai.service.impl.EmployeeDataService.EmployeeProfile;
 import dev.spring.ai.service.impl.EmployeeDataService.LeaveRecord;
 import dev.spring.ai.service.impl.EmployeeDataService.ProjectAllocation;
 import org.slf4j.Logger;
@@ -9,21 +10,29 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Spring AI tool definitions that expose employee data to the LLM.
  *
- * Each method annotated with {@link Tool} can be invoked by the LLM during a chat session.
- * The LLM decides when to call these tools based on the context in the prompt.
- * Spring AI handles the round-trip automatically:
+ * Each method annotated with {@link Tool} is registered with the LLM as a callable function.
+ * The LLM decides which tools to call, and in what order, based on what information it needs.
+ * All tools return raw data with no pre-filtering or interpretation — the LLM does all reasoning.
  *
- *   LLM reads prompt
- *     → decides it needs leave / allocation data
- *     → Spring AI invokes the tool method          ← logs fire HERE, between the two LLM calls
- *     → raw result is sent back to the LLM
- *     → LLM reasons over the data and produces its final answer
+ * Tool interaction pattern (agentic loop):
  *
- * Both tools return raw data with no pre-filtering or interpretation — the LLM does all reasoning.
+ *   Iteration 1: LLM calls getTeamProjectAllocations()
+ *                 → discovers who is free and when
+ *   Iteration 2: LLM calls getEmployeeSkillProfile() for each available candidate
+ *                 → discovers their technical skills; narrows down the shortlist
+ *   Iteration 3: LLM calls getTeamLeaveRecords()
+ *                 → cross-checks shortlisted candidates for leave conflicts
+ *   Iteration 4: LLM calls draftResourceRecommendation() with the final candidate's details
+ *                 → this is the ACTION tool; it can only be called once all read tools
+ *                   have been executed because its parameters (name, availableFrom,
+ *                   matchedSkills, leaveConflicts) come directly from the read results.
+ *                   This is the forcing function that makes the loop genuinely sequential.
+ *   Final:        LLM receives confirmation and produces its summary answer.
  */
 @Component
 public class EmployeeTools
@@ -97,5 +106,100 @@ public class EmployeeTools
 		log.info("----------------------------------------------------------------");
 
 		return allocations;
+	}
+
+	/**
+	 * Tool — proxy for the HR employee skill / profile database.
+	 *
+	 * This is a PARAMETERISED tool: the LLM passes the name of a specific employee
+	 * it wants to know about.  This is the key difference from the two bulk tools above —
+	 * the LLM can only call this after it has already identified candidate names from
+	 * getTeamProjectAllocations().  That sequential dependency is what creates the
+	 * agentic loop: the output of one iteration determines the input of the next.
+	 *
+	 * @param employeeName the full name of the employee whose profile is requested
+	 * @return the skill profile, or a not-found message if the name is unknown
+	 */
+	@Tool(description = """
+			Fetches the skill profile for a single employee from the HR database.
+			Returns their role, primary technology, full list of technical skills, and years of experience.
+			Pass the employee's full name as the parameter.
+			""")
+	public String getEmployeeSkillProfile(String employeeName)
+	{
+		log.info("----------------------------------------------------------------");
+		log.info("TOOL CALL : LLM requested → getEmployeeSkillProfile(\"{}\")", employeeName);
+		log.info("           Source  : HR employee skill database (proxy)");
+		log.info("           Action  : Fetching skill profile for employee : {}", employeeName);
+
+		Optional<EmployeeProfile> profile = employeeDataService.getEmployeeProfile(employeeName);
+
+		if (profile.isEmpty())
+		{
+			log.info("           Result  : No profile found for '{}'", employeeName);
+			log.info("----------------------------------------------------------------");
+			return "No profile found for employee: " + employeeName;
+		}
+
+		EmployeeProfile p = profile.get();
+		String result = String.format(
+				"Name: %s | Role: %s | Primary Technology: %s | Skills: %s | Experience: %d years",
+				p.employeeName(), p.role(), p.primaryTechnology(), p.skills(), p.yearsOfExperience()
+		);
+
+		log.info("           Result  : {}", result);
+		log.info("           Sending skill profile back to LLM...");
+		log.info("----------------------------------------------------------------");
+
+		return result;
+	}
+
+	/**
+	 * Tool — ACTION tool that records the final resource recommendation.
+	 *
+	 * This is the key forcing function of the agentic loop.  Unlike the three READ tools
+	 * above, this tool requires the LLM to supply specific data it could only have obtained
+	 * by calling the read tools first:
+	 *
+	 *   employeeName   → only known after calling getTeamProjectAllocations
+	 *   availableFrom  → only known after calling getTeamProjectAllocations
+	 *   matchedSkills  → only known after calling getEmployeeSkillProfile
+	 *   leaveConflicts → only known after calling getTeamLeaveRecords
+	 *
+	 * Because all four parameters depend on prior read results, the LLM cannot call
+	 * this tool in isolation or batch it with the reads in a single iteration.
+	 * It is forced to gather all data first — that is what makes this a genuine agentic loop.
+	 *
+	 * @param employeeName   full name of the recommended employee
+	 * @param availableFrom  date from which the employee is free (YYYY-MM-DD or "immediately")
+	 * @param matchedSkills  the skills that match the project requirement
+	 * @param leaveConflicts summary of any leave conflicts, or "None" if clear
+	 * @return confirmation string that the recommendation has been recorded
+	 */
+	@Tool(description = """
+			Records a resource recommendation for a project assignment.
+			Takes the recommended employee's name, the date they are available from,
+			the skills that match the project requirement, and any leave conflicts during the period.
+			Returns a confirmation that the recommendation has been recorded.
+			""")
+	public String draftResourceRecommendation(String employeeName,
+	                                           String availableFrom,
+	                                           String matchedSkills,
+	                                           String leaveConflicts)
+	{
+		log.info("----------------------------------------------------------------");
+		log.info("TOOL CALL : LLM requested → draftResourceRecommendation()");
+		log.info("           Action         : Recording final resource recommendation");
+		log.info("           Employee       : {}", employeeName);
+		log.info("           Available From : {}", availableFrom);
+		log.info("           Matched Skills : {}", matchedSkills);
+		log.info("           Leave Conflicts: {}", leaveConflicts);
+		log.info("           ✓ Recommendation recorded — returning confirmation to LLM");
+		log.info("----------------------------------------------------------------");
+
+		return String.format(
+				"Recommendation recorded: %s is available from %s with skills [%s]. Leave conflicts: %s.",
+				employeeName, availableFrom, matchedSkills, leaveConflicts
+		);
 	}
 }
