@@ -1,0 +1,190 @@
+Meeting Transcript — SolarVision Platform Kickoff & Planning Workshop
+Date: March 12, 2025
+Duration: 2 hours 40 minutes
+Participants:
+- Priya Mehta (PM) – Project Manager
+- Ravi Shah (Tech Lead) – Backend Lead Developer
+- Neha Patel (UX Designer) – UI/UX Specialist
+- Ankit Sharma (Frontend Developer)
+- Rahul Desai (Data Engineer)
+- Meena Raval (QA Lead)
+- Karan Joshi (Product Owner)
+- Client Representatives: Arjun Nair (CTO), Sneha Rao (Operations Head)
+
+---
+
+1. Opening Remarks
+
+Priya: Good morning, everyone. Today’s session will help us align on the goals, scope, and expectations for the SolarVision Platform. It’s a strategic initiative for our client, GreenEra Energy, focused on monitoring and managing solar installations across India. The goal is to provide live tracking of solar generation data, predictive maintenance, and financial reporting dashboards.
+
+Arjun (Client CTO): Thanks, Priya. Our main priority is visibility and control — real-time performance monitoring for each solar farm, energy output analytics, and predictive alerts to detect panel underperformance. We’re also looking for smooth scalability; today we handle 200 solar sites, and in two years we expect 1000+.
+
+Karan: That’s a great overview. From our product side, we’re treating this as a platform, not just a dashboard — meaning future microservices should easily plug in. The MVP will cover:
+1. Site onboarding and configuration
+2. Live metrics ingestion (solar energy data per minute)
+3. Data visualization dashboards
+4. Alerting rules and notifications
+5. User and role management
+
+---
+
+2. Architecture & Technology Discussion
+
+Ravi (Tech Lead): We’ll design a modular backend using Spring Boot microservices communicating via REST and Kafka events. We’ll have three core services:
+- Site Service – site onboarding, asset mapping, and configurations
+- Data Stream Service – handles live telemetry from IoT gateways
+- Analytics Service – processes metrics for KPIs, trends, and predictions
+
+For scalability, we’ll containerize with Docker and orchestrate using AWS ECS Fargate. Data will be stored in PostgreSQL for relational data and InfluxDB for time-series telemetry.
+
+Arjun (Client): I like that. Are we planning for any predictive algorithms right now?
+
+Ravi: In the MVP, we’ll limit predictive analytics to threshold-based alerts — for example, if a solar panel’s efficiency drops below 80% compared to historical averages. In Phase 2, we’ll add machine learning models for degradation prediction and yield forecasting.
+
+Rahul (Data Engineer): We can preprocess raw IoT data before it reaches the analytics layer. The gateway sends JSON packets every minute with readings such as voltage, current, and temperature. I’ll use Apache Flink for real-time processing and store aggregated summaries every 10 minutes. That’ll reduce data volume by ~80%.
+
+Priya: Perfect. Let’s document that data flow — IoT → Flink → InfluxDB → Analytics Service → Dashboard.
+
+---
+
+3. UI/UX & Design Flow
+
+Neha (UX): I’ve created wireframes for three main modules:
+1. Dashboard Overview – shows total energy produced, CO₂ savings, and a live map of solar sites.
+2. Site Details Page – detailed analytics per site with historical graphs and alert status.
+3. Alert Management – allows setting conditions and reviewing triggered alerts.
+
+We’ll maintain a responsive layout using React + Tailwind for a clean and modern feel. We’ll also add light/dark themes since field engineers often check data outdoors.
+
+Ankit (Frontend): For charts, I’ll use Recharts since it integrates nicely with our existing React stack. I’ll build reusable widgets for energy output, panel health, and cost efficiency metrics. We can integrate the APIs progressively as the backend endpoints become available.
+
+Sneha (Client): We’d like the dashboards to support exporting data to Excel and PDF for our management meetings.
+
+Ankit: That’s doable — we’ll include an export utility in the analytics page.
+Neha: And we’ll also provide filter options for date ranges, site selection, and status.
+
+---
+
+4. Security & Access Control
+
+Karan (PO): Since the platform will be accessed by both GreenEra employees and external maintenance contractors, role-based access control is key.
+
+Ravi: Exactly. We’ll use Spring Security with JWT tokens. There’ll be three roles:
+- Admin – full access including site configuration
+- Operator – view dashboards, acknowledge alerts
+- Maintenance Engineer – limited to assigned sites
+
+Priya: What about multi-tenancy?
+
+Ravi: Not for MVP. But we’ll architect for it — site ownership will be mapped to organization IDs so it can scale later.
+
+Meena (QA Lead): We must also log user activities. I recommend storing audit logs for all critical actions like alert creation, site modification, and user role changes. That helps in compliance.
+
+Ravi: Agreed. I’ll create an AuditLogService capturing key actions and writing them to a separate PostgreSQL table.
+
+---
+
+5. Data Analytics & Reporting
+
+Rahul: Our initial KPIs will include:
+- Energy generation per site (kWh/day)
+- System efficiency (output vs installed capacity)
+- Downtime percentage per site
+- Estimated revenue and CO₂ offset
+
+We’ll visualize daily, weekly, and monthly trends.
+For predictive components in Phase 2, we can introduce a linear regression model to forecast production based on temperature and irradiance.
+
+Arjun: Excellent. Also, we’ll want automated email reports. Maybe a weekly summary of top-performing and underperforming sites.
+
+Priya: We’ll add that as a backlog item — “Auto-generated reports via scheduled service.”
+
+Karan: Could we also expose a REST API for clients to integrate this data into their ERP?
+
+Ravi: Yes, through an /api/export endpoint with secure tokens.
+
+---
+
+6. Quality Assurance Plan
+
+Meena (QA): I propose three testing phases:
+1. Unit Testing – developers write JUnit tests for each service (target 80% coverage)
+2. Integration Testing – we’ll use Testcontainers for PostgreSQL and Kafka simulation
+3. UAT – conducted with sample solar site data from the client
+
+We’ll prepare test data for 5 pilot sites.
+Additionally, we’ll integrate QA into CI/CD — GitHub Actions pipeline triggers unit tests on pull requests.
+
+Ravi: Agreed. Also, we’ll have a staging environment deployed on ECS separate from production.
+
+Meena: For non-functional testing, we’ll perform:
+- Load testing (simulate 10,000 readings/minute)
+- Security scanning (OWASP)
+- Data retention validation for 6 months of telemetry
+
+---
+
+7. Timelines & Milestones
+
+Priya: Let’s confirm the timeline.
+
+Milestone | Description | Owner | Target Date
+-----------|--------------|--------|--------------
+Sprint 1 | Backend setup + Site Service | Ravi | Mar 25
+Sprint 2 | Data Stream Service + Flink pipeline | Rahul | Apr 8
+Sprint 3 | Analytics Service + Dashboard API | Ravi & Ankit | Apr 22
+Sprint 4 | Frontend Integration + QA | Neha & Meena | May 6
+Sprint 5 | UAT + Client Review | Priya & Arjun | May 20
+Go-Live | Production Deployment | Team | Jun 1
+
+Priya: If all goes well, we can demo the MVP in early June.
+Arjun: That works for us.
+
+---
+
+8. Risk & Dependency Discussion
+
+Karan: Let’s identify risks early:
+1. Delays in IoT gateway data availability from client’s vendor.
+2. Integration complexity between Flink and InfluxDB.
+3. QA environment setup may require additional AWS costs.
+
+Ravi: For risk #1, we’ll simulate data streams if actual sensors are delayed.
+Rahul: For #2, I’ll start integration with mock telemetry data.
+Priya: Great. For AWS costs, I’ll discuss budget allocation with finance.
+
+---
+
+9. Action Items
+
+Action Item | Owner | Deadline
+-------------|--------|-----------
+Document detailed architecture diagram | Ravi | Mar 15
+Finalize data ingestion pipeline (Flink → InfluxDB) | Rahul | Mar 20
+Prepare frontend component list | Neha | Mar 18
+Create test case templates | Meena | Mar 25
+Client to share sample IoT data JSON | Arjun | Mar 22
+Define alert thresholds | Karan | Mar 24
+Confirm API authentication strategy | Ravi | Mar 19
+
+---
+
+10. Client Feedback & Closing Notes
+
+Sneha (Client): This was very detailed. Please share the summary and project plan by Friday. We’ll review and provide sign-off early next week.
+
+Priya: Absolutely. Thanks, everyone. Let’s keep this momentum.
+
+Arjun: Appreciate the structured approach. Looking forward to seeing the first prototype.
+
+Meeting Adjourned: 12:45 PM
+
+---
+
+Appendix A — Discussion Highlights
+
+- Tech Stack Summary: Spring Boot, Kafka, PostgreSQL, InfluxDB, React, Docker, AWS ECS, Apache Flink.
+- Security: JWT + role-based access + audit logs.
+- Analytics KPIs: energy generation, efficiency, downtime, CO₂ offset, revenue estimate.
+- Deliverables: MVP by June 1, 2025.
+- Next Meeting: Progress check — March 26, 2025.
