@@ -1,0 +1,25 @@
+Meeting Title: Daily Stand-up
+Date: 2025-04-10
+Participants: Alice (Backend Developer), John (Frontend Developer), Maya (QA Engineer), Tom (Scrum Master)
+
+Agenda:
+- Share daily updates
+- Highlight blockers
+- Review yesterday’s progress
+
+Discussion:
+Alice reported that the API for user registration has been completed and deployed to the staging environment. She will start working on the password reset flow today.
+John mentioned that the new dashboard layout is implemented, but he is facing a small alignment issue in responsive mode. He will coordinate with Alice to verify API integration once the dashboard is stable.
+Maya completed 15 test cases for the profile module and will begin testing the dashboard once it’s merged.
+Tom reminded everyone to update their Jira tasks before the next scrum call and requested John to raise a ticket for the UI bug.
+
+Decisions:
+- API for password reset will be developed and tested by April 12th.
+- UI bug for dashboard responsiveness will be fixed by April 11th.
+- QA testing for the dashboard to begin on April 13th.
+
+Action Items:
+- Alice: Implement password reset flow.
+- John: Fix responsive issue and update Jira ticket.
+- Maya: Prepare dashboard test plan.
+- Tom: Review sprint progress tomorrow.
