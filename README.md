@@ -45,6 +45,20 @@ A hands-on learning project exploring Spring AI features using Java 21, Spring B
 - Base URL: `http://localhost:8080/spring-ai`
 - Swagger UI: `http://localhost:8080/spring-ai/swagger-ui/index.html`
 
+## Branch: AI-1 — Simple Chat Generation
+
+Demonstrates basic integration with OpenAI's ChatGPT using Spring AI's `ChatClient`.
+
+### Implemented Features
+
+- REST endpoint to send a message to ChatGPT and get a response.
+
+### How to Test
+
+```bash
+curl --location 'http://localhost:8080/spring-ai/chat?message=Hello'
+```
+
 ---
 
 ## Branch: AI-2 — Output Parsing
