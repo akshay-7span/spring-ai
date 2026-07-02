@@ -1,0 +1,221 @@
+ABC COMPANY — EMPLOYEE HANDBOOK
+Version 2.1 | Effective Date: January 1, 2024
+Human Resources Department
+
+This handbook is intended for all full-time and part-time employees of ABC Company. It outlines the policies, procedures, and guidelines that govern the working environment. All employees are expected to read, understand, and comply with the contents of this handbook.
+
+================================================================================
+SECTION 1: JOINING AND ONBOARDING
+================================================================================
+
+Welcome to ABC Company. We are delighted to have you as part of our growing team. The onboarding process is designed to help new employees settle into their roles smoothly and understand the company culture.
+
+On your first day, you will be required to submit your joining documents to the HR department. These include your educational certificates, previous employment letters, identity proof, and address proof. You will also be asked to fill out a nominee form for your benefits.
+
+Your reporting manager will provide you with a 30-day onboarding plan. This plan outlines the meetings, training sessions, and introductions you will have during your first month. Please attend all onboarding sessions on time and carry a notepad for notes.
+
+Each new employee is assigned a buddy — a senior team member who will help you navigate your first few weeks. Your buddy is your first point of contact for any informal questions about how things work at ABC Company. Do not hesitate to reach out to your buddy if you feel lost or confused.
+
+During the onboarding period, you will be required to complete mandatory compliance training. This includes data privacy, workplace harassment prevention, and information security modules. All modules must be completed within the first 15 days of joining.
+
+Your system access, email account, and employee ID will be activated on the first day by the IT department. Please collect your laptop and access card from the IT helpdesk located on the second floor. You will be required to sign an equipment receipt form before taking possession of any company device.
+
+================================================================================
+SECTION 2: PROBATION PERIOD AND CONFIRMATION
+================================================================================
+
+All new employees at ABC Company are placed on a probation period of six months from their date of joining. During the probation period, your performance, attendance, attitude, and overall conduct will be closely observed by your reporting manager.
+
+At the end of the third month, your manager will conduct an informal mid-probation check-in to discuss how you are settling in. This is not a formal evaluation but an opportunity to identify any gaps and provide early support.
+
+At the end of the six-month probation period, your manager will submit a formal probation review to the HR department. The review will assess your technical skills, communication, teamwork, punctuality, and adherence to company policies. Based on this assessment, HR will issue a confirmation letter.
+
+If your performance during the probation period is found to be unsatisfactory, the company reserves the right to extend the probation by an additional three months or terminate the employment. You will be formally notified in writing if your probation is being extended.
+
+Employees on probation are not eligible to apply for planned leaves exceeding three consecutive days. In case of a medical emergency, you must inform your manager and the HR department immediately and submit a medical certificate upon return. Sick leave during probation will be recorded and considered during the final probation review.
+
+Please note that the performance bar during probation is the same as for permanent employees. Working hard, being proactive, and maintaining a positive attitude will help you clear your probation successfully.
+
+================================================================================
+SECTION 3: LEAVE POLICY
+================================================================================
+
+ABC Company provides a comprehensive leave policy to support the health, wellbeing, and personal commitments of its employees. The following types of leaves are available to all confirmed employees.
+
+3.1 CASUAL LEAVE
+Every confirmed employee is entitled to 12 casual leaves per calendar year. Casual leave is intended for short, unplanned personal needs such as attending to a household emergency, a family event, or a personal errand. Casual leave cannot be carried forward to the next year and lapses if unused by December 31.
+
+To apply for casual leave, log in to the HR portal at hrportal.abccompany.com, navigate to the Leave Management section, and submit a leave request at least one day in advance. For urgent situations, you may apply on the same day but must inform your manager over phone or message before doing so.
+
+3.2 SICK LEAVE
+Every confirmed employee is entitled to 12 sick leaves per calendar year. Sick leave is specifically intended for situations where the employee is unwell and unable to attend work. Sick leave cannot be applied in advance — it is only to be used when the employee is actually ill on that day.
+
+HOW TO APPLY FOR SICK LEAVE:
+Step 1 — Inform your reporting manager via phone call or WhatsApp message before 9:30 AM on the day you are unwell. Do not wait until the afternoon to inform. Early communication is important so your manager can plan the day accordingly.
+Step 2 — Log in to the HR portal and apply for sick leave under the Leave Management section. Select "Sick Leave" as the leave type and enter the date and reason.
+Step 3 — If your sick leave extends beyond two consecutive days, you are required to submit a medical certificate from a registered doctor. The certificate must be submitted to the HR department within two days of your return to office.
+Step 4 — Your manager will review and approve the sick leave application on the portal. You will receive a confirmation email once the leave is approved.
+
+Sick leave cannot be combined with casual leave or earned leave to extend a holiday period. Misuse of sick leave — such as applying for sick leave while attending a personal event — is treated as a disciplinary matter.
+
+Unused sick leave at the end of the year lapses and cannot be encashed or carried forward.
+
+3.3 EARNED LEAVE
+Every confirmed employee accumulates 1.5 earned leaves per month, totalling 18 earned leaves per year. Earned leave is intended for planned vacations, personal milestones, or extended rest periods.
+
+To apply for earned leave, submit your request on the HR portal at least 7 days in advance. Your manager must approve the leave before you proceed with any travel or personal plans. Earned leave applications submitted without prior manager approval will not be considered.
+
+Earned leave can be carried forward up to a maximum of 30 days into the next year. Any balance exceeding 30 days will lapse automatically on January 1. Employees who resign or are terminated may apply for encashment of their earned leave balance as per the company's settlement policy.
+
+3.4 LEAVE WITHOUT PAY
+If an employee has exhausted all available leave balances and requires additional time off, they may apply for Leave Without Pay (LWP). LWP requires written approval from both the reporting manager and the HR department. LWP of more than 5 consecutive days also requires approval from the department head.
+
+================================================================================
+SECTION 4: WORK FROM HOME POLICY
+================================================================================
+
+ABC Company recognizes that flexible work arrangements can improve employee productivity and wellbeing. The Work From Home (WFH) policy is designed to enable employees to work remotely while maintaining the same level of output and availability as in the office.
+
+WHO IS ELIGIBLE TO WORK FROM HOME:
+Employees who have completed their probation period and have received their confirmation letter are eligible to apply for work from home. Employees on probation are expected to work from the office every day unless there is a medical reason supported by a certificate.
+
+HOW TO REQUEST WORK FROM HOME:
+To request a work from home day, send a message to your reporting manager on the company's communication platform (Slack or Microsoft Teams) by 9:00 AM on the day you wish to work from home. Your manager has the discretion to approve or deny the request based on team requirements and workload.
+
+For recurring work from home arrangements — such as every Friday — you must submit a formal WFH request through the HR portal. The request will be reviewed by your manager and the HR department. Approved recurring WFH arrangements are valid for three months and must be renewed thereafter.
+
+WORK FROM HOME EXPECTATIONS:
+While working from home, employees are expected to be available on all communication channels during standard working hours (9:30 AM to 6:30 PM). You must attend all scheduled meetings via video call and keep your camera on unless you have a specific reason not to.
+
+Employees working from home are responsible for ensuring a stable internet connection, a professional background during video calls, and a quiet working environment. The company will not reimburse home internet costs unless explicitly approved by the HR department for special roles.
+
+All security policies apply when working from home. Do not access company systems on public Wi-Fi without using the company VPN. Do not share your screen or confidential documents in an unsecured environment. Your home workstation is subject to the same data protection rules as the office.
+
+If you are working from home and fall sick during the day, you must not continue working. Inform your manager and apply for sick leave for that day on the HR portal. Working from home does not count as working if you are genuinely unwell.
+
+================================================================================
+SECTION 5: PERFORMANCE REVIEW PROCESS
+================================================================================
+
+ABC Company conducts formal performance reviews twice a year — in June and December. The performance review process is designed to recognize high performers, identify areas of improvement, and align individual goals with company objectives.
+
+5.1 GOAL SETTING
+At the beginning of each half-year, employees and their managers collaboratively set performance goals. These goals must be specific, measurable, achievable, relevant, and time-bound (SMART). Goals are documented on the HR portal under the Performance Management section and must be finalized within the first two weeks of January and July respectively.
+
+5.2 MID-CYCLE CHECK-IN
+Three months into each review cycle, managers are encouraged to conduct a mid-cycle check-in with each team member. This informal conversation helps track progress, remove blockers, and recalibrate goals if business priorities have shifted. There is no formal documentation required for mid-cycle check-ins.
+
+5.3 WHAT HAPPENS DURING A PERFORMANCE REVIEW:
+Step 1 — Self Assessment: Two weeks before the review date, employees are required to complete a self-assessment on the HR portal. In the self-assessment, you rate yourself on each goal and provide specific examples of your achievements, challenges faced, and areas where you need support.
+Step 2 — Manager Assessment: Your reporting manager independently reviews your performance against the set goals and completes a manager assessment on the portal. The manager assesses your technical output, communication, collaboration, ownership, and growth mindset.
+Step 3 — Calibration Meeting: Managers across teams participate in a calibration meeting organized by HR. In this meeting, performance ratings are discussed and normalized to ensure fairness across departments. An employee's rating may change slightly after calibration.
+Step 4 — Review Discussion: Your manager schedules a one-on-one review meeting with you to discuss the final assessment. This is your opportunity to understand your strengths, areas of improvement, and career development path. Be open to feedback and come prepared with questions.
+Step 5 — Rating Submission: After the review discussion, your manager submits the final performance rating on the HR portal. Ratings range from 1 (Below Expectations) to 5 (Exceptional). Ratings of 4 and above are eligible for performance bonuses and accelerated promotions.
+
+5.4 PERFORMANCE IMPROVEMENT PLAN (PIP)
+Employees who receive a rating of 1 or 2 in two consecutive review cycles will be placed on a Performance Improvement Plan (PIP). The PIP is a structured 90-day program where the employee works closely with their manager and HR to address specific performance gaps. A PIP is not a termination notice — it is an opportunity to course-correct. Successful completion of a PIP results in the employee returning to the standard review cycle.
+
+================================================================================
+SECTION 6: TRAVEL AND REIMBURSEMENT POLICY
+================================================================================
+
+Employees who are required to travel for business purposes are covered under the ABC Company Travel and Reimbursement Policy. All business travel must be pre-approved before any bookings are made.
+
+HOW TO GET TRAVEL APPROVED:
+Before you leave for a business trip, you must submit a travel request on the HR portal at least 5 working days in advance. The request must include the destination, purpose of travel, expected dates, and estimated budget. Your manager must approve the travel request before the HR and finance teams process it.
+
+Once the travel is approved, the finance team will issue a travel advance if requested. All expenses incurred during the trip must be supported by original receipts. Submit your expense report on the HR portal within 7 days of returning from the trip. Expenses submitted after 30 days will not be reimbursed.
+
+ELIGIBLE TRAVEL EXPENSES:
+Flight tickets (economy class for domestic, economy for international travel under 6 hours), hotel accommodation (as per the grade-wise limits defined in the travel policy document), local conveyance including taxi and auto-rickshaw fares, meals up to a daily limit of Rs. 800 for domestic travel, and visa fees for international travel.
+
+INELIGIBLE TRAVEL EXPENSES:
+Alcohol, personal entertainment, shopping, room service beyond the meal limit, and any expenses not directly related to the business purpose of the trip are not reimbursable. Any disputed reimbursement must be escalated to the HR department within 15 days of the rejection.
+
+When traveling for business, employees are ambassadors of ABC Company and must conduct themselves with professionalism. Adhere to the dress code, be punctual for client meetings, and represent the company values at all times.
+
+================================================================================
+SECTION 7: OFFICE CONDUCT AND DISCIPLINE
+================================================================================
+
+ABC Company is committed to maintaining a respectful, inclusive, and professional work environment. All employees are expected to uphold the company's values and conduct themselves appropriately at all times.
+
+PROFESSIONAL CONDUCT:
+Treat every colleague, client, and visitor with respect and courtesy. Discriminatory remarks, offensive language, or hostile behavior towards any individual based on gender, religion, caste, nationality, or disability will not be tolerated. Violations will result in immediate disciplinary action.
+
+Employees are expected to dress in a manner that is professional and appropriate for the work environment. Business casuals are acceptable from Monday to Thursday. Fridays are designated casual dress days. Client-facing employees must adhere to formal dress code on days when clients visit the office.
+
+DISCIPLINARY PROCESS:
+If an employee's conduct or performance is found to be in violation of company policy, the following disciplinary process will be followed. First, a verbal warning will be issued by the reporting manager. If the behavior continues, a written warning will be issued by the HR department. A second written warning may result in suspension without pay. Continued violations may lead to termination of employment.
+
+Performance issues that arise from misconduct — such as repeatedly leaving the office early without permission, excessive absenteeism, or insubordination — are treated separately from performance review ratings. Disciplinary actions are recorded in the employee's HR file and may influence future promotion decisions.
+
+Employees who feel they have been treated unfairly in a disciplinary matter may raise a grievance with the HR department. All grievances will be investigated objectively and resolved within 15 working days.
+
+================================================================================
+SECTION 8: MEETING ROOM AND OFFICE FACILITY GUIDELINES
+================================================================================
+
+ABC Company offices are equipped with meeting rooms, collaboration spaces, and common areas for the use of all employees. The following guidelines ensure that these facilities are used effectively and courteously.
+
+BOOKING A MEETING ROOM:
+All meeting rooms must be booked in advance through the facility management system available on the company intranet. Walk-in use of meeting rooms without prior booking is not permitted except in emergencies. To book a room, log in to the intranet, navigate to Facility Management, select the desired room, choose the date and time, and confirm the booking.
+
+Meeting rooms are available from 8:00 AM to 9:00 PM on weekdays. Bookings beyond 9:00 PM require special approval from the administration team. Weekend bookings must be approved by both your manager and the administration team.
+
+MEETING ROOM ETIQUETTE:
+Please leave the meeting room in a clean and organized condition after use. Wipe the whiteboard, arrange the chairs, and ensure all cables and equipment are properly stored before you leave the room. Do not leave behind food wrappers, bottles, or personal belongings.
+
+If you have booked a meeting room and no longer need it, please cancel the booking immediately so others can use it. Rooms that are booked but unused for more than 15 minutes will be automatically released by the facility system for others to book.
+
+Meetings that run overtime must not inconvenience the next booking. Please wrap up and leave the meeting room at least five minutes before your booking ends. If you need more time, check availability and extend the booking through the system before your current booking expires.
+
+COMMON AREAS AND PANTRY:
+The pantry and common areas are for the use of all employees. Please clean up after yourself, do not leave dirty dishes in the sink, and be mindful of noise levels. The pantry is stocked with tea, coffee, and light snacks. Personal food items must be stored in the designated refrigerator and labelled with your name and date.
+
+================================================================================
+SECTION 9: IT AND EQUIPMENT POLICY
+================================================================================
+
+All employees at ABC Company are issued company equipment including a laptop, mouse, keyboard, and headset. This equipment is the property of ABC Company and must be used responsibly and exclusively for work purposes.
+
+EQUIPMENT CARE AND RESPONSIBILITY:
+You are personally responsible for the equipment assigned to you. Do not leave your laptop unattended in public spaces. In case of loss or theft, report it immediately to the IT helpdesk and the HR department. The company may recover the cost of lost equipment from the employee if negligence is established.
+
+When working from home, take your laptop in the company-provided bag. Do not use personal laptops for company work as they may not meet the security requirements. If your home workstation requires additional equipment such as an external monitor or keyboard, submit a request to the IT department. Such requests are subject to availability and manager approval.
+
+SOFTWARE AND SYSTEM PERFORMANCE:
+Do not install unauthorized software on company devices. Installing unlicensed software, games, or personal applications is a violation of the IT policy and may result in disciplinary action. If you need a specific software tool for your work, raise a request with the IT department providing the name of the tool, its purpose, and your manager's approval.
+
+Regularly restart your laptop to ensure system performance is maintained. If you notice a slowdown in system performance or encounter persistent technical issues, raise a ticket on the IT helpdesk portal immediately. Do not attempt to repair or modify company hardware on your own.
+
+All company data must be stored on approved cloud storage platforms such as Google Drive or the company's internal file server. Do not store sensitive company data on personal storage devices such as USB drives or personal cloud accounts. Data stored on personal devices will not be recoverable if lost and may pose a security risk.
+
+PASSWORD AND ACCESS POLICY:
+Your company email and system passwords must be changed every 90 days. Passwords must be at least 12 characters long and include uppercase letters, lowercase letters, numbers, and special characters. Do not share your password with anyone — including your manager or IT staff. If you forget your password, use the self-service password reset option on the login page.
+
+================================================================================
+SECTION 10: RESIGNATION AND EXIT PROCESS
+================================================================================
+
+If you decide to leave ABC Company, we ask that you follow the formal resignation and exit process to ensure a smooth transition for your team and to complete all formalities correctly.
+
+HOW TO RESIGN:
+Submit your resignation letter to your reporting manager and the HR department via email. The resignation letter must clearly state your last working day, which must be in accordance with your notice period as defined in your employment contract. Most employees at ABC Company are required to serve a notice period of 60 days.
+
+After you submit your resignation, your manager will initiate a knowledge transfer process. You are expected to document all ongoing projects, pending tasks, and important contacts, and hand over responsibilities to a designated colleague. Failure to complete the knowledge transfer may affect your final settlement.
+
+NOTICE PERIOD AND LEAVE:
+During the notice period, you are expected to be fully available and continue performing your duties diligently. You may not apply for earned leave during the notice period except in cases of medical emergency supported by a certificate. Casual leave during the notice period requires manager approval and will be considered on a case-by-case basis.
+
+If you wish to leave before the end of your notice period, you may apply for a notice period waiver. The waiver must be approved by your manager and the HR department. If the waiver is not granted, you will be required to pay the company a notice period buyout equivalent to your salary for the remaining notice days.
+
+EXIT FORMALITIES:
+On your last working day, you must return all company equipment including your laptop, access card, and any other company property. Visit the IT helpdesk to hand over the equipment and obtain a clearance certificate. Once all clearances are obtained, the HR department will process your full and final settlement within 45 days of your last working day.
+
+You will receive your experience letter and relieving letter from the HR department after the full and final settlement is processed. Please ensure your personal contact details and bank account information are updated on the HR portal before your last day to avoid delays in settlement.
+
+================================================================================
+END OF ABC COMPANY EMPLOYEE HANDBOOK
+For queries, contact HR at hr@abccompany.com or visit the HR helpdesk on the 3rd floor.
+================================================================================
